@@ -6,6 +6,7 @@ import { changeColor, changeBrushSize } from "../../slice/toolboxSlice.js";
 import React from "react";
 import { PiDotsSixBold } from "react-icons/pi";
 import cx from "classnames";
+import { socket } from "@/socket.js";
 
 const Toolbox = () => {
     const dispatch = useDispatch();
@@ -14,7 +15,9 @@ const Toolbox = () => {
     const showBrushToolOptions =
         activeMenuItem === MENU_ITEMS.PENCIL ||
         activeMenuItem === MENU_ITEMS.ERASER;
-    const color = useSelector((state) => state.toolbox[activeMenuItem].color);
+    const { color, size } = useSelector(
+        (state) => state.toolbox[activeMenuItem]
+    );
 
     // updateBrushSize function_______________________________________________
 
@@ -22,10 +25,12 @@ const Toolbox = () => {
         dispatch(
             changeBrushSize({ item: activeMenuItem, size: event.target.value })
         );
+        socket.emit("changeConfig", { color, size: event.target.value });
     };
 
     const updateColor = (newColor) => {
         dispatch(changeColor({ item: activeMenuItem, color: newColor }));
+        socket.emit("changeConfig", { color: newColor, size });
     };
 
     // draggable function______________________________________________________

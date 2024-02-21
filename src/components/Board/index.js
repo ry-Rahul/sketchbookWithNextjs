@@ -5,7 +5,7 @@ import { changeColor, changeBrushSize } from "../../slice/toolboxSlice.js";
 import { MENU_ITEMS } from "@/constants";
 import { menuItemClick, actionItemClick } from "../../slice/menuSlice.js";
 import { socket } from "@/socket";
-
+import { config } from "@fortawesome/fontawesome-svg-core";
 
 const Board = () => {
     // useref is a hook that allows us to access the dom element directly
@@ -23,10 +23,6 @@ const Board = () => {
 
     // download feature
     useEffect(() => {
-
-  
-        
-        
         if (!canvasRef.current) return;
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
@@ -61,12 +57,17 @@ const Board = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
 
-        const changeConfig = () => {
+        const changeConfig = (color,size) => {
             context.strokeStyle = color;
             context.lineWidth = size;
         };
 
-        changeConfig();
+        changeConfig(color, size);
+        // socket function_______________________________________________________
+        const handleConfigChange = (data) => {
+            changeConfig(data.color, data.size);
+        };
+        socket.on("changeConfig", handleConfigChange);
     }, [color, size]);
 
     // Mount the canvas to the dom
@@ -80,24 +81,35 @@ const Board = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const beginPath = (event) => {
+        const beginPath = ( x,y) => {
             context.beginPath();
-            context.moveTo(event.clientX, event.clientY);
+            context.moveTo(x, y);
         };
-        const drawLine = (event) => {
-            context.lineTo(event.clientX, event.clientY);
+        const drawLine = (x,y) => {
+            context.lineTo(x, y);
             context.stroke();
         };
 
         const handleMouseDown = (event) => {
             shouldDraw.current = true;
-            beginPath(event);
+            beginPath(event.clientX, event.clientY);
             socket.emit("beginPath", { x: event.clientX, y: event.clientY });
         };
 
         const handleMouseMove = (event) => {
             if (!shouldDraw.current) return;
-            drawLine(event);
+            drawLine(event.clientX, event.clientY);
+            socket.emit("drawLine", { x: event.clientX, y: event.clientY });
+        };
+
+        // Socket.io_function_______________________________________________________
+        const handleBeginPath = (data) => {
+            console.log("beginPath"+data);
+            beginPath(data.x , data.y);
+        };
+        const handleDrawLine = (data) => {
+            console.log(data);
+            drawLine(data.x , data.y);
         };
 
         const handleMouseUp = () => {
@@ -112,19 +124,20 @@ const Board = () => {
             historyPointer.current = drawHistory.current.length - 1;
         };
 
+        socket.on("beginPath", handleBeginPath);
+        socket.on("drawLine", handleDrawLine);
+
         canvas.addEventListener("mousedown", handleMouseDown);
         canvas.addEventListener("mousemove", handleMouseMove);
         canvas.addEventListener("mouseup", handleMouseUp);
-
-              // mount socket 
-              socket.on("connect", () => {
-                console.log("Connected to server");
-              });
 
         return () => {
             canvas.removeEventListener("mousedown", handleMouseDown);
             canvas.removeEventListener("mousemove", handleMouseMove);
             canvas.removeEventListener("mouseup", handleMouseUp);
+
+            socket.off("beginPath", handleBeginPath);
+            socket.off("drawLine", handleDrawLine);
         };
     }, []);
     return (
