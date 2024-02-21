@@ -1,4 +1,6 @@
 import { io } from "socket.io-client";
-
-export const socket = io("http://localhost:3005");
-
+const URL =
+    process.env.NODE_ENV === "production"
+        ? "https://sketchbookbackend.onrender.com"
+        : "http://localhost:5000";
+export const socket = io(URL);
