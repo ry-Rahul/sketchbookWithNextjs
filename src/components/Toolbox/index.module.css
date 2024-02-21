@@ -1,0 +1,44 @@
+.toolboxContainer {
+    @apply px-5 absolute top-1/4 left-5 w-64 rounded-md;
+    box-shadow: theme("colors.shadow1");
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    border: 1px solid theme("colors.border1");
+    background: theme("colors.background1");
+
+    .innerContainer {
+        width: 100%;
+
+        .dot {
+            width: 100%;
+            height: 20px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+    }
+
+    .toolItem {
+        @apply mb-5;
+
+        .toolText {
+            margin-top: 5px;
+            font-size: 11px;
+            color: theme("colors.text1");
+            padding: 5px 0;
+        }
+
+        .itemContainer {
+            @apply flex justify-between items-center;
+            .colorBox {
+                @apply h-5 w-5 rounded-sm cursor-pointer mr-1;
+                &:hover,
+                &.active {
+                    /* border: 1.5px solid theme("colors.border2"); */
+                    border: 2px solid theme("colors.border2");
+                    box-shadow: theme("colors.shadow1");
+
+                }
+            }
+        }
+    }
+}

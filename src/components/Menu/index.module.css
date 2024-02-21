@@ -1,0 +1,20 @@
+.menuContainer {
+    @apply absolute px-5 py-1 flex justify-between left-1/2 w-1/4 rounded-md top-10;
+    border: 1px solid theme("colors.border1");
+    transform: translate(-50%);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    background-color: theme("colors.background1");
+
+    .iconWrapper {
+        @apply cursor-pointer h-7 w-7 flex justify-center items-center rounded-md;
+
+        &:hover,
+        &.active {
+            background-color: theme("colors.text2");
+        }
+        .icon {
+            color: theme("colors.text1");
+            font-size: 20px;
+        }
+    }
+}
